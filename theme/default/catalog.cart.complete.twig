@@ -27,15 +27,15 @@
                     <table class="table table-striped mt-3 mb-5">
                         <tr>
                             <th style="width: 50%">Customer Name</th>
-                            <td style="width: 50%">{{ order.user ? order.user.getName() : order.delivery.client }}</td>
+                            <td style="width: 50%">{{ order.delivery.client }}</td>
                         </tr>
                         <tr>
                             <th>Phone</th>
-                            <td>{{ order.user and order.user.phone ? order.user.phone : order.phone }}</td>
+                            <td>{{ order.phone }}</td>
                         </tr>
                         <tr>
                             <th>E-Mail</th>
-                            <td>{{ order.user and order.user.email ? order.user.email : order.email }}</td>
+                            <td>{{ order.email }}</td>
                         </tr>
                         <tr>
                             <th>Delivery address</th>
@@ -72,9 +72,9 @@
                         {% for item in order.products %}
                             <tr>
                                 <td>{{ item.title }}</td>
-                                <td class="text-right">{{ item.price|number_format(2, '.', ' ') }}</td>
-                                <td class="text-right">{{ item.count }}</td>
-                                <td class="text-right">{{ (item.price * item.count)|number_format(2, '.', ' ') }}</td>
+                                <td class="text-right">{{ item.getPrice()|number_format(2, '.', ' ') }}</td>
+                                <td class="text-right">{{ item.getCount() }}</td>
+                                <td class="text-right">{{ item.getSum()|number_format(2, '.', ' ') }}</td>
                             </tr>
                         {% endfor %}
 
