@@ -74,7 +74,7 @@
                                 <td>{{ item.title }}</td>
                                 <td class="text-right">{{ item.getPrice()|number_format(2, '.', ' ') }}</td>
                                 <td class="text-right">{{ item.getCount() }}</td>
-                                <td class="text-right">{{ item.getSum()|number_format(2, '.', ' ') }}</td>
+                                <td class="text-right">{{ item.getTotal()|number_format(2, '.', ' ') }}</td>
                             </tr>
                         {% endfor %}
 
