@@ -95,6 +95,16 @@
             line-height: 20px;
             text-align: center;
         }
+
+        [data-input].has-error input {
+            border-color: red;
+        }
+        [data-input] + label.error {
+            display: none;
+        }
+        [data-input].has-error + label.error {
+            display: inline;
+        }
     </style>
 
     {% include 'common/breadcrumbs.twig' with {
@@ -278,6 +288,11 @@
                                                         'data': {'catalog-cart-data': ''}
                                                     }
                                                 } %}
+
+                                                <label class="error">
+                                                    We have a limit on the number of orders for the specified day,
+                                                    please select another date.
+                                                </label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
