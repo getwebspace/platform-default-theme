@@ -106,9 +106,9 @@
                             <h3 class="price">
                                 {% if product.discount %}
                                     ${{ product.price - product.discount }}
-                                    <span>${{ product.price }}</span>
+                                    <span>${{ catalog_product_show_price(product) }}</span>
                                 {% else %}
-                                    ${{ product.price }}
+                                    ${{ catalog_product_show_price(product) }}
                                 {% endif %}
                             </h3>
 
@@ -140,7 +140,7 @@
                                 </div>
 
                                 {# include product options #}
-                                {% include 'catalog.product.options.twig' with {'categories': categories, 'product': product} only %}
+                                {% include 'catalog.product.options.twig' with {'categories': categories, 'product': product, 'user': user} only %}
                             </div>
                         </div>
                     </div>

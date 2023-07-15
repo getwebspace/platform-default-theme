@@ -26,11 +26,11 @@
             <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ product.address }}">{{ product.title }}</a>
         </h4>
         <div class="price">
-            <span>${{ product.price }}</span>
+            <span>${{ catalog_product_show_price(product) }}</span>
         </div>
     </div>
 
     {# include product options #}
-    {% include 'catalog.product.options.twig' with {'categories': categories, 'product': product} only %}
+    {% include 'catalog.product.options.twig' with {'categories': categories, 'product': product, 'user': user} only %}
 </div>
 <!-- End Product -->
