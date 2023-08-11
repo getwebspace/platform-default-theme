@@ -2,6 +2,11 @@
 
 {% block title %}Заказ {{ order.serial }} {{ order.external_id ? '(' ~ order.external_id ~ ')' : '' }} | {{ parent() }}{% endblock %}
 
+{% block head %}
+    <meta name="robots" content="noindex, nofollow">
+    {{ parent() }}
+{% endblock %}
+
 {% block page %}
     {% include 'common/breadcrumbs.twig' with {
         'catalog': 'Catalog',
