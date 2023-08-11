@@ -21,10 +21,6 @@
 
                             {% if provider == 'self' %}
                                 {% set other = false %}
-                                {% if parameter('user_auth_code_is_enabled', 'no') == 'yes' %}
-                                    {% set other = true %}
-                                    <a href="?provider=code" class="btn btn-info btn-block text-uppercase">Login via Code</a>
-                                {% endif %}
 
                                 {% if oauth %}
                                     <div class="social-login">
@@ -39,6 +35,11 @@
                                             {% endfor %}
                                         </div>
                                     </div>
+                                {% endif %}
+
+                                {% if parameter('user_auth_code_is_enabled', 'no') == 'yes' %}
+                                    {% set other = true %}
+                                    <a href="?provider=code" class="btn btn-outline-secondary btn-block d-block text-uppercase mt-1">Login via Code</a>
                                 {% endif %}
 
                                 {% if other %}
