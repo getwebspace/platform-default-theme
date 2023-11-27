@@ -42,8 +42,12 @@
                             {% for store in reference('store_location') %}
                                 <div class="mb-3">
                                     <h3>{{ store.title }}</h3>
-                                    {% if store.value.contact.email %}
-                                        <p class="phone">Phone: {{ store.value.contact.phone }}</p>
+                                    {% if store.value.contact.phone %}
+                                        <p class="phone">Phone:
+                                            <a href="tel:{{ store.value.contact.phone }}">
+                                                {{ store.value.contact.phone }}
+                                            </a>
+                                        </p>
                                     {% endif %}
                                     <p>{{ store.value.address }}</p>
                                     <p>{{ store.value.times|replace({'\n': '<br>'})|raw }}</p>

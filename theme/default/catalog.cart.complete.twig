@@ -1,6 +1,6 @@
 {% extends 'main.twig' %}
 
-{% block title %}Заказ {{ order.serial }} {{ order.external_id ? '(' ~ order.external_id ~ ')' : '' }} | {{ parent() }}{% endblock %}
+{% block title %}Order {{ order.serial }} {{ order.external_id ? '(' ~ order.external_id ~ ')' : '' }} | {{ parent() }}{% endblock %}
 
 {% block head %}
     <meta name="robots" content="noindex, nofollow">
