@@ -203,10 +203,27 @@
                             </li>
 
                             <li>
-                                <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFour"
-                                    aria-expanded="false" aria-controls="collapseFour">Shipping Address</h6>
+                                <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">Shipping Address</h6>
                                 <section class="checkout-steps-form-content collapse" id="collapseFour" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
                                     <div class="row">
+                                        <div class="col-12">
+                                            <div class="single-form form-default">
+                                                <label>Delivery Type (*)</label>
+
+                                                <div class="form-input form">
+                                                    {% include 'mixin/form.twig' with {
+                                                        'type': 'select',
+                                                        'args': {
+                                                            'data': {'catalog-cart-delivery': ''}
+                                                        }
+                                                    } %}
+
+                                                    {# include cart options #}
+                                                    {% include 'catalog.cart.options.twig' %}
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div class="col-md-6">
                                             <div class="single-form form-default">
                                                 <label>Country (*)</label>
@@ -330,15 +347,21 @@
                             <h5 class="title">Total</h5>
 
                             <div class="sub-total-price">
-                                <div class="total-price shipping">
+                                <div class="total-price">
+                                    <p class="value">Subtotal:</p>
+                                    <p class="price" data-catalog-cart-total>$0.00</p>
+                                </div>
+                            </div>
+                            <div class="sub-total-price">
+                                <div class="total-price">
                                     <p class="value">Shipping:</p>
-                                    <p class="price">Free</p>
+                                    <p class="price" data-catalog-cart-total-service>$0.00</p>
                                 </div>
                             </div>
                             <div class="total-payable">
                                 <div class="payable-price">
-                                    <p class="value">Subotal Price:</p>
-                                    <p class="price" data-catalog-cart-total>$144.00</p>
+                                    <p class="value">Total:</p>
+                                    <p class="price" data-catalog-cart-total-all>$0.00</p>
                                 </div>
                             </div>
                             <div class="price-table-btn button">

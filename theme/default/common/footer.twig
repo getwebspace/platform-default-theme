@@ -39,15 +39,21 @@
                     <div class="col-lg-3 col-md-6 col-12">
                         <!-- Single Widget -->
                         <div class="single-footer f-contact">
-                            <h3>Get In Touch With Us</h3>
-                            <p class="phone">Phone: {{ parameter('var_phone', '+1 (900) 00 000 0000') }}</p>
-                            <ul>
-                                <li><span>Monday-Friday: </span> 9.00 am - 8.00 pm</li>
-                                <li><span>Saturday: </span> 10.00 am - 6.00 pm</li>
-                            </ul>
-                            <p class="mail">
-                                <a href="mailto:{{ parameter('var_email', 'support@example.com') }}">{{ parameter('var_email', 'support@example.com') }}</a>
-                            </p>
+                            {% for store in reference('store_location') %}
+                                <div class="mb-3">
+                                    <h3>{{ store.title }}</h3>
+                                    {% if store.value.contact.email %}
+                                        <p class="phone">Phone: {{ store.value.contact.phone }}</p>
+                                    {% endif %}
+                                    <p>{{ store.value.address }}</p>
+                                    <p>{{ store.value.times|replace({'\n': '<br>'})|raw }}</p>
+                                    {% if store.value.contact.email %}
+                                        <p class="mail">
+                                            <a href="mailto:{{ store.value.contact.email }}">{{ store.value.contact.email }}</a>
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
                         </div>
                         <!-- End Single Widget -->
                     </div>
@@ -133,9 +139,9 @@
                             <li>
                                 <span>Follow Us On:</span>
                             </li>
-                            <li><a href="{{ parameter('var_soc_facebook', '#') }}"><i class="lni lni-facebook-filled"></i></a></li>
-                            <li><a href="{{ parameter('var_soc_twitter', '#') }}"><i class="lni lni-twitter-original"></i></a></li>
-                            <li><a href="{{ parameter('var_soc_instagram', '#') }}"><i class="lni lni-instagram"></i></a></li>
+                            {% for url, title in reference('social_network').pluck('title', 'value.url') %}
+                                <li><a href="{{ url }}"><i class="fab fa-{{ title|lower }}"></i></a></li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>

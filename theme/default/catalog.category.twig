@@ -50,7 +50,7 @@
 
     {% include 'common/breadcrumbs.twig' with {
         'catalog': 'Catalog',
-        'parents': catalog_category_parents(category),
+        'parents': category.getParents(),
     } %}
 
     <!-- Start Product Grids -->
@@ -67,7 +67,7 @@
                         </div>
                         <!-- End Widget -->
 
-                        {% include 'catalog.category.menu.twig' with {'categories':categories, 'parent': category.uuid.toString() ?? NIL} %}
+                        {% include 'catalog.category.menu.twig' with {'categories':categories, 'parent': category.uuid.toString() ?? null} %}
                         {% include 'catalog.category.price.twig' with {'products': products} %}
                         {% include 'catalog.category.attributes.twig' with {'category': category, 'products': products} %}
                         {% include 'catalog.category.filter.twig' with {'category': category, 'products': products} %}

@@ -11,13 +11,13 @@
             </div>
         </div>
         <div class="row">
-            {% for category in catalog_category({'parent': NIL}) %}
+            {% for category in catalog_category({'parent_uuid': null}) %}
                 <div class="col-lg-4 col-md-6 col-12">
                     <!-- Start Single Category -->
                     <div class="single-category" style="min-height: 184px;">
                         <h3 class="heading">{{ category.title }}</h3>
                         <ul>
-                            {% for sub in catalog_category({'parent': category.uuid}) %}
+                            {% for sub in catalog_category({'parent_uuid': category.uuid}) %}
                                 <li><a href="/{{ parameter('catalog_address', 'catalog') }}/{{ sub.address }}">{{ sub.title }}</a></li>
                             {% endfor %}
                         </ul>
@@ -26,7 +26,7 @@
                                 'src': category.hasFiles() ? category.getFiles().first().getPublicPath('middle') : 'https://via.placeholder.com/180x180',
                                 'title': category.title,
                                 'alt': category.title,
-                                'style': 'height: 180px; object-fit: contain;'
+                                'style': 'height: 100%; width: 180px; object-fit: contain;'
                             } only %}
                         </div>
                     </div>

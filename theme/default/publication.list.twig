@@ -68,7 +68,7 @@
                         <div class="widget categories-widget">
                             <h5 class="widget-title">Top Categories</h5>
                             <ul class="custom">
-                                {% for node in categories.where('parent', '=', NIL).sortBy('title') %}
+                                {% for node in categories.where('parent_uuid', null).sortBy('title') %}
                                     <li>
                                         <a href="/{{ node.address }}">{{ node.title }}</a>
                                     </li>
