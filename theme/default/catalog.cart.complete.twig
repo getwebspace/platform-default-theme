@@ -93,7 +93,7 @@
                                     <td>{{ item.title }}</td>
                                     <td class="text-end">{{ item.getPrice()|number_format(2, '.', ' ') }}</td>
                                     <td class="text-end">{{ item.getDiscount()|number_format(2, '.', ' ') }}</td>
-                                    <td class="text-end">{{ item.getTax()|number_format(2, '.', ' ') }}</td>
+                                    <td class="text-end">{{ item.getTax()|number_format(0, '.', ' ') }}</td>
                                     <td class="text-end">{{ item.getCount()|number_format(2, '.', ' ') }}</td>
                                     <td class="text-end">{{ item.getTotalCalculated()|number_format(2, '.', ' ') }}</td>
                                 </tr>
