@@ -1,5 +1,6 @@
 <noindex>
     {% set deliveries = reference('delivery', true) %}
+    {% set payments = reference('payment').pluck('title', 'uuid') %}
 
     {% for product in catalog_product({'uuid': deliveries.pluck('*.uuid').flatten().all()}) %}
         <!-- auto generated product options: (uuid:{{ product.uuid }}, external_id:{{ product.external_id }}) -->
@@ -13,4 +14,5 @@
     {% endfor %}
 
     <script>window.catalog.delivery = {{ json_encode(deliveries) }}</script>
+    <script>window.catalog.payment = {{ json_encode(payments) }}</script>
 </noindex>

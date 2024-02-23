@@ -52,6 +52,9 @@
         }
     </script>
 
+    {# include cart options #}
+    {% include 'catalog.cart.options.twig' %}
+
     <style>
         .cart-container > .table {
             margin: 0;
@@ -203,7 +206,7 @@
                             </li>
 
                             <li>
-                                <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">Shipping Address</h6>
+                                <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">Shipping Address </h6>
                                 <section class="checkout-steps-form-content collapse" id="collapseFour" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
                                     <div class="row">
                                         <div class="col-12">
@@ -217,9 +220,6 @@
                                                             'data': {'catalog-cart-delivery': ''}
                                                         }
                                                     } %}
-
-                                                    {# include cart options #}
-                                                    {% include 'catalog.cart.options.twig' %}
                                                 </div>
                                             </div>
                                         </div>
@@ -330,7 +330,35 @@
 
                                         <div class="col-md-12">
                                             <div class="steps-form-btn button">
-                                                <button class="btn" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">previous</button>
+                                                <button class="btn" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">next</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </li>
+
+                            <li>
+                                <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFour">Payment method</h6>
+                                <section class="checkout-steps-form-content collapse" id="collapseFive" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="single-form form-default">
+                                                <label>Payment Method (*)</label>
+
+                                                <div class="form-input form">
+                                                    {% include 'mixin/form.twig' with {
+                                                        'type': 'select',
+                                                        'name': 'payment',
+                                                        'args': {
+                                                            'data': {'catalog-cart-payment': ''}
+                                                        }
+                                                    } %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <div class="steps-form-btn button">
                                                 <a href="javascript:void(0)" class="btn btn-alt" data-catalog-cart-checkout>Checkout</a>
                                             </div>
                                         </div>
