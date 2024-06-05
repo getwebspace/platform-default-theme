@@ -7,7 +7,7 @@
         <div data-catalog-item="{{ product.uuid }}" style="display: none;">
             <span data-catalog-item-attr="uuid">{{ product.uuid }}</span>
             <span data-catalog-item-attr="title">{{ product.title }}</span>
-            <span data-catalog-item-attr="price">{{ product.getPriceCalculated('price') }}</span>
+            <span data-catalog-item-attr="price">{{ product.price('price') }}</span>
             <span data-catalog-item-attr="type">{{ product.type }}</span>
         </div>
         <!-- auto generated product options: end -->

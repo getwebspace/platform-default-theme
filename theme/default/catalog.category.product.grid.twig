@@ -2,7 +2,7 @@
 <div class="single-product" data-catalog-item>
     <div class="product-image">
         {% include 'mixin/img.twig' with {
-            'src': product.hasFiles() ? product.getFiles().first().getPublicPath('middle') : 'https://via.placeholder.com/335x335',
+            'src': product.images.first().public_path('middle') ?? '/assets/img/no_image.png',
             'title': product.title,
             'alt': product.title,
             'style': 'height: 288px; object-fit: contain;'
@@ -21,12 +21,12 @@
         </div>
     </div>
     <div class="product-info">
-        <span class="category">{{ categories.firstWhere('uuid', product.category).title }}</span>
+        <span class="category">{{ product.category.title }}</span>
         <h4 class="title">
-            <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ product.address }}">{{ product.title }}</a>
+            <a href="/catalog/{{ product.address }}">{{ product.title }}</a>
         </h4>
         <div class="price">
-            <span>${{ product.getPriceCalculated(catalog_product_price_type()) }}</span>
+            <span>${{ product.price(catalog_product_price_type()) }}</span>
         </div>
     </div>
 

@@ -56,7 +56,7 @@
 
     {% include 'common/breadcrumbs.twig' with {
         'catalog': 'Catalog',
-        'parents': category.getParents(),
+        'parents': category.parents(),
         'title': product.meta.title ? product.meta.title : (product.title ?? 'Product')
     } %}
 
@@ -70,18 +70,18 @@
                             <main id="gallery">
                                 <div class="main-img">
                                     {% include 'mixin/img.twig' with {
-                                        'src': product.hasFiles() ? product.getFiles().first().getPublicPath('middle') : 'https://via.placeholder.com/1000x670',
-                                        'placeholder': product.hasFiles() ? product.getFiles().first().getPublicPath('small') : '',
+                                        'src': product.images.first().public_path('middle') ?? '/assets/img/no_image.png',
+                                        'placeholder': product.images.first().public_path('small') ?? '/assets/img/no_image.png',
                                         'id': 'current',
                                         'title': product.title,
                                         'alt': product.title,
                                     } only %}
                                 </div>
                                 <div class="images">
-                                    {% for index, file in product.getFiles().sortBy('date') %}
-                                        <a href="{{ file.getPublicPath('full') }}" data-fancybox="group" class="img">
+                                    {% for index, file in product.images %}
+                                        <a href="{{ file.public_path('full') }}" data-fancybox="group" class="img">
                                             {% include 'mixin/img.twig' with {
-                                                'src': file.getPublicPath('full'),
+                                                'src': file.public_path('full'),
                                                 'title': product.title,
                                                 'alt': product.title ~ ' ' ~ index
                                             } only %}
@@ -100,11 +100,11 @@
                                     {{ tag }}
                                 {% endfor %}
 
-                                <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ category.address }}">{{ category.title }}</a>
+                                <a href="/catalog/{{ category.address }}">{{ category.title }}</a>
                             </p>
 
                             <h3 class="price">
-                                {% set price = product.getPriceCalculated(catalog_product_price_type()) %}
+                                {% set price = product.price(catalog_product_price_type()) %}
                                 {% if product.discount %}
                                     ${{ price }}
                                     <span>${{ price + product.discount }}</span>
@@ -113,7 +113,7 @@
                                 {% endif %}
                             </h3>
 
-                            {% if product.extra is not empty %}
+                            {% if product.extra %}
                                 <p class="info-text">{{ product.extra|raw }}</p>
                             {% endif %}
 
@@ -157,45 +157,38 @@
                                 <h4>Details</h4>
                                 <p>{{ product.description|raw }}</p>
 
-                                <h4>Features</h4>
-                                <ul class="normal-list">
-                                    {% if product.field1 %}<li><span>{{ category.product.field_1 }}</span>: {{ product.field1 }}</li>{% endif %}
-                                    {% if product.field2 %}<li><span>{{ category.product.field_2 }}</span>: {{ product.field2 }}</li>{% endif %}
-                                    {% if product.field3 %}<li><span>{{ category.product.field_3 }}</span>: {{ product.field3 }}</li>{% endif %}
-                                    {% if product.field4 %}<li><span>{{ category.product.field_4 }}</span>: {{ product.field4 }}</li>{% endif %}
-                                    {% if product.field5 %}<li><span>{{ category.product.field_5 }}</span>: {{ product.field5 }}</li>{% endif %}
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-12">
-                            <div class="info-body">
                                 <h4>Specifications</h4>
                                 <ul class="normal-list">
                                     {% if product.country %}<li><span>Country:</span> {{ product.country }}</li>{% endif %}
                                     {% if product.manufacturer %}<li><span>Manufacturer:</span> {{ product.manufacturer }}</li>{% endif %}
                                     {% if product.vendorcode %}<li><span>Vendorcode:</span> {{ product.vendorcode }}</li>{% endif %}
                                     {% if product.barcode %}<li><span>Barcode:</span> {{ product.barcode }}</li>{% endif %}
-                                    {% if product.dimension.weight_class %}<li><span>Volume:</span> {{ product.getWeightWithClass() }}</li>{% endif %}
+                                    {% if product.dimension.weight_class %}<li><span>Volume:</span> {{ product.weightWithClass() }}</li>{% endif %}
                                     {% if product.tax %}<li><span>Stock</span>: {{ product.stock > 0 ? '<span>In stock</span>' : '<span>Out of stock</span>' }}</li>{% endif %}
                                     {% if product.stock %}<li><span>Tax</span>: {{ product.tax }}</li>{% endif %}
-                                    {% if product.dimension.length_class %}<li><span>Dimension</span>: {{ product.getSpecificationWithClass() }}</li>{% endif %}
+                                    {% if product.dimension.length_class %}<li><span>Dimension</span>: {{ product.specificationWithClass() }}</li>{% endif %}
                                 </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-12">
+                            <div class="info-body">
                                 <h4>Attributes:</h4>
                                 <ul class="normal-list">
-                                    {% for attribute in product.getAttributes() %}
-                                        <li><span>{{ attribute.title }}</span>: {{ attribute.value }}</li>
+                                    {% for attribute in product.attributes %}
+                                        <li><span>{{ attribute.title }}</span>: {{ attribute.value() }}</li>
                                     {% endfor %}
+                                    {% if product.tax %}<li><span>VAT:</span> ${{ product.tax() }}</li>{% endif %}
                                 </ul>
-                                {% if product.hasRelations() %}
+                                {% if product.relations.count() %}
                                     <h4>Related products:</h4>
                                     <ul class="normal-list">
-                                        {% for relative in product.getRelations() %}
+                                        {% for relative in product.relations %}
                                             <li>
                                                 <span>
-                                                    <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ relative.related.address }}">
-                                                        {{ relative.related.title }}
+                                                    <a href="/catalog/{{ relative.address }}">
+                                                        {{ relative.title }}
                                                     </a>
-                                                </span>: ${{ relative.related.price }} &times; {{ relative.count }} &equals; ${{ relative.related.price * relative.count }}
+                                                </span>: ${{ relative.price(catalog_product_price_type()) }} &times; {{ relative.pivot.count }} &equals; ${{ relative.price * relative.pivot.count }}
                                             </li>
                                         {% endfor %}
                                     </ul>

@@ -13,14 +13,14 @@
 
                     {% if catalog %}
                         <li>
-                            <a href="/{{ parameter('catalog_address', 'catalog') }}">{{ catalog }}</a>
+                            <a href="/catalog">{{ catalog }}</a>
                         </li>
                     {% endif %}
 
-                    {% for item in parents %}
+                    {% for item in parents|reverse() %}
                         {% if item.title %}
                             <li>
-                                <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ item.address }}">{{ item.title }}</a>
+                                <a href="/catalog/{{ item.address }}">{{ item.title }}</a>
                             </li>
                         {% else %}
                             <li>{{ item }}</li>

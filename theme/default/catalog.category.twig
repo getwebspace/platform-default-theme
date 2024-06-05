@@ -50,7 +50,7 @@
 
     {% include 'common/breadcrumbs.twig' with {
         'catalog': 'Catalog',
-        'parents': category.getParents(),
+        'parents': category.parents(),
     } %}
 
     <!-- Start Product Grids -->
@@ -67,10 +67,9 @@
                         </div>
                         <!-- End Widget -->
 
-                        {% include 'catalog.category.menu.twig' with {'categories':categories, 'parent': category.uuid.toString() ?? null} %}
+                        {% include 'catalog.category.menu.twig' with {'categories':categories, 'parent': category.uuid} %}
                         {% include 'catalog.category.price.twig' with {'products': products} %}
                         {% include 'catalog.category.attributes.twig' with {'category': category, 'products': products} %}
-                        {% include 'catalog.category.filter.twig' with {'category': category, 'products': products} %}
                     </div>
                     <!-- End Product Sidebar -->
                 </div>
@@ -108,7 +107,7 @@
                                                 Try to <a href="{{ non_page_path() }}{{ page ? '/' ~ page : '' }}">remove filters</a>
                                                 {% if category %}
                                                     or return to a
-                                                    <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ categories.firstWhere('uuid', category.parent).address }}">category above</a>
+                                                    <a href="/catalog/{{ categories.firstWhere('uuid', category.parent).address }}">category above</a>
                                                 {% endif %}
                                             </p>
                                         </div>
@@ -136,7 +135,7 @@
                                                 Try to <a href="{{ non_page_path() }}{{ page ? '/' ~ page : '' }}">remove filters</a>
                                                 {% if category %}
                                                     or return to a
-                                                    <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ categories.firstWhere('uuid', category.parent).address }}">category above</a>
+                                                    <a href="/catalog/{{ categories.firstWhere('uuid', category.parent).address }}">category above</a>
                                                 {% endif %}
                                             </p>
                                         </div>

@@ -2,8 +2,8 @@
     <div class="blog-img">
         <a href="/{{ item.address }}">
             {% include 'mixin/img.twig' with {
-                'src': item.hasFiles() ? item.getFiles().first().getPublicPath('middle') : 'https://via.placeholder.com/300x215',
-                'placeholder': item.hasFiles() ? item.getFiles().first().getPublicPath('small') : '',
+                'src': item.images.first().public_path('middle') ?? '/assets/img/no_image.png',
+                'placeholder': item.images.first().public_path('small') ?? '/assets/img/no_image.png',
                 'title': item.title,
                 'alt': item.title,
                 'style': 'display:block; height: 300px; width: 100%; object-fit: contain; object-position: center center;'
@@ -13,7 +13,7 @@
     <div class="blog-content">
         {{ item.date|df }} |
         <a class="category" href="/{{ item.category.address }}">{{ item.category.title }}</a> |
-        {{ item.user.getName('short') }}
+        {{ item.user.name('short') }}
         <h4>
             <a href="/{{ item.address }}">{{ item.title }}</a>
         </h4>

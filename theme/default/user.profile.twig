@@ -160,7 +160,7 @@
                                                             'name': 'allow_mail',
                                                             'args': {
                                                                 'option': _(['yes', 'no']),
-                                                                'selected': user.getAllowMail() ? 'yes' : 'no'
+                                                                'selected': user.allow_mail ? 'yes' : 'no'
                                                             }
                                                         } %}
                                                     </div>
@@ -174,7 +174,7 @@
                                                             'type': 'text',
                                                             'name': 'language',
                                                             'args': {
-                                                                'value': user.language ?? _language,
+                                                                'value': user.language ? user.language :  _language,
                                                                 'placeholder': 'Language',
                                                                 'readonly': true
                                                             }
@@ -206,8 +206,51 @@
                                 </section>
                             </li>
 
+                            {% if user.orders %}
+                                <li class="mt-2">
+                                    <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapsefive" aria-expanded="false" aria-controls="collapsefive">Orders</h6>
+                                    <section class="checkout-steps-form-content collapse p-0" id="collapsefive" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
+                                        <table class="table table-striped">
+                                            <tr>
+                                                <th class="text-center">#</th>
+                                                <th class="text-center">Order date</th>
+                                                <th class="text-center">Shipping date</th>
+                                                <th class="text-center">Count products</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Payment</th>
+                                                <th class="text-center">Total</th>
+                                            </tr>
+                                            {% for order in user.orders %}
+                                                <tr>
+                                                    <td class="text-center">{{ order.serial }}</td>
+                                                    <td class="text-center">{{ order.date|df }}</td>
+                                                    <td class="text-center">{{ order.shipping|df }}</td>
+                                                    <td class="text-center">{{ order.products.count() }}</td>
+                                                    <td class="text-center">{{ order.status.title ?: '&mdash;'|raw }}</td>
+                                                    <td class="text-center">{{ order.payment.title ?: '&mdash;'|raw }}</td>
+                                                    <td class="text-center text-nowrap">{{ order.totalSum()|number_format(2, '.', ' ') }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </section>
+                                </li>
+                            {% endif %}
+
+                            {% if user.group %}
+                                <li class="mt-2">
+                                    <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-group" aria-expanded="false" aria-controls="collapse-group">Group</h6>
+                                    <section class="checkout-steps-form-content collapse" id="collapse-group" aria-labelledby="headingTwo" data-bs-parent="#accordion">
+                                        <div class="row pt-4">
+                                            <div class="col-12"><b>{{ user.group.title }}</b></div>
+                                            <div class="col-12">{{ user.group.description }}</div>
+                                        </div>
+                                    </section>
+                                </li>
+
+                            {% endif %}
+
                             {% if user.tokens %}
-                                <li>
+                                <li class="mt-2">
                                     <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-tokens" aria-expanded="false" aria-controls="collapse-tokens">Active sessions</h6>
                                     <section class="checkout-steps-form-content collapse" id="collapse-tokens" aria-labelledby="headingFour" data-bs-parent="#accordion">
                                         {% for token in user.tokens %}
@@ -215,59 +258,16 @@
                                                 <div class="col-8"><b>{{ token.comment }}</b></div>
                                                 <div class="col-4 text-end">{{ token.ip }}</div>
                                                 <div class="col-12">{{ token.agent }}</div>
-                                                <div class="col-12">{{ token.date|df }}</div>
+                                                <div class="col-6">{{ token.date|df }}</div>
+                                                <div class="col-6 text-end">
+                                                    <a class="btn btn-secondary" href="/user/revoke?uuid={{ token.uuid }}">Close session</a>
+                                                </div>
                                             </div>
                                         {% endfor %}
 
                                         <div class="row pt-4">
                                             <a class="btn btn-primary" href="/user/revoke">Close other sessions</a>
                                         </div>
-                                    </section>
-                                </li>
-                            {% endif %}
-
-                            {% if oauth %}
-                                <li>
-                                    <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-social" aria-expanded="false" aria-controls="collapse-social">Social networks</h6>
-                                    <section class="checkout-steps-form-content collapse" id="collapse-social" aria-labelledby="headingFour" data-bs-parent="#accordion">
-                                        <div class="row pt-4">
-                                            {% for type in oauth %}
-                                                <div class="col-md-6 mb-2">
-                                                    <a class="btn btn-primary w-100" href="/user/oauth/{{ type }}">
-                                                        <span class="d-block">{{ type }}</span>
-                                                        <small class="d-block">{{ user.getIntegrations().firstWhere('provider', type) ? 'Connected' : 'Disconnected' }}</small>
-                                                    </a>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </section>
-                                </li>
-                            {% endif %}
-
-                            {% if user.orders.count() %}
-                                <li>
-                                    <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapsefive" aria-expanded="false" aria-controls="collapsefive">Orders</h6>
-                                    <section class="checkout-steps-form-content collapse p-0" id="collapsefive" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
-                                        <table class="table table-striped">
-                                            <tr>
-                                                <th class="text-center">#</th>
-                                                <th class="text-center">Status</th>
-                                                <th class="text-center">Order date</th>
-                                                <th class="text-center">Shipping date</th>
-                                                <th class="text-center">Count products</th>
-                                                <th class="text-center">Total</th>
-                                            </tr>
-                                            {% for order in user.orders %}
-                                                <tr>
-                                                    <td class="text-center">{{ order.serial }}</td>
-                                                    <td class="text-center">{{ order.status ? order.status.title : '&mdash;'|raw }}</td>
-                                                    <td class="text-center">{{ order.date|df }}</td>
-                                                    <td class="text-center">{{ order.shipping|df }}</td>
-                                                    <td class="text-center">{{ order.hasProducts() }}</td>
-                                                    <td class="text-center text-nowrap">{{ order.getTotalPrice()|number_format(2, '.', ' ') }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </table>
                                     </section>
                                 </li>
                             {% endif %}

@@ -15,7 +15,7 @@
                     <div class="user">
                         <i class="lni lni-user"></i>
                     </div>
-                    <a href="/user/profile">{{ user.getName('short') ?? user.username }}</a>
+                    <a href="/user/profile">{{ user.name('short') ?? user.username }}</a>
                 </li>
                 {% if user.group and 'cup:main' in user.group.access %}
                     <li>

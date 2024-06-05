@@ -8,7 +8,7 @@
             <ul class="list">
                 {% for node in subnodes.sortBy('order') %}
                     <li>
-                        <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ node.address }}">{{ node.title }}</a>
+                        <a href="/catalog/{{ node.address }}">{{ node.title }}</a>
                     </li>
                 {% endfor %}
             </ul>
@@ -23,7 +23,7 @@
     <ul class="list">
         {% for node in categories.where('parent_uuid', null).sortBy('order') %}
             <li>
-                <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ node.address }}">{{ node.title }}</a>
+                <a href="/catalog/{{ node.address }}">{{ node.title }}</a>
             </li>
         {% endfor %}
     </ul>

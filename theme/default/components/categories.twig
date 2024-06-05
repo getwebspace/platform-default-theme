@@ -18,12 +18,12 @@
                         <h3 class="heading">{{ category.title }}</h3>
                         <ul>
                             {% for sub in catalog_category({'parent_uuid': category.uuid}) %}
-                                <li><a href="/{{ parameter('catalog_address', 'catalog') }}/{{ sub.address }}">{{ sub.title }}</a></li>
+                                <li><a href="/catalog/{{ sub.address }}">{{ sub.title }}</a></li>
                             {% endfor %}
                         </ul>
                         <div class="images">
                             {% include 'mixin/img.twig' with {
-                                'src': category.hasFiles() ? category.getFiles().first().getPublicPath('middle') : 'https://via.placeholder.com/180x180',
+                                'src': category.images.first().public_path('middle') ?? '/assets/img/no_image.png',
                                 'title': category.title,
                                 'alt': category.title,
                                 'style': 'height: 100%; width: 180px; object-fit: contain;'

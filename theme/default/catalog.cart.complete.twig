@@ -76,26 +76,26 @@
                             <th class="text-end">Subtotal</th>
                         </tr>
 
-                        {% for item in order.getProducts('product') %}
+                        {% for item in order.products().where('type', 'product').get() %}
                             <tr>
                                 <td>{{ item.title }}</td>
-                                <td class="text-end">{{ item.getPrice()|number_format(2, '.', ' ') }}</td>
-                                <td class="text-end">{{ item.getDiscount()|number_format(2, '.', ' ') }}</td>
-                                <td class="text-end">{{ item.getTax()|number_format(2, '.', ' ') }}</td>
-                                <td class="text-end">{{ item.getCount()|number_format(2, '.', ' ') }}</td>
-                                <td class="text-end">{{ item.getTotalCalculated()|number_format(2, '.', ' ') }}</td>
+                                <td class="text-end">{{ item.totalPrice()|number_format(2, '.', ' ') }}</td>
+                                <td class="text-end">{{ item.totalDiscount()|number_format(2, '.', ' ') }}</td>
+                                <td class="text-end">{{ item.totalTax()|number_format(2, '.', ' ') }}</td>
+                                <td class="text-end">{{ item.totalCount()|number_format(2, '.', ' ') }}</td>
+                                <td class="text-end">{{ item.totalSum()|number_format(2, '.', ' ') }}</td>
                             </tr>
                         {% endfor %}
 
                         <tbody>
-                            {% for item in order.getProducts('service') %}
+                            {% for item in order.products().where('type', 'service').get() %}
                                 <tr>
                                     <td>{{ item.title }}</td>
-                                    <td class="text-end">{{ item.getPrice()|number_format(2, '.', ' ') }}</td>
-                                    <td class="text-end">{{ item.getDiscount()|number_format(2, '.', ' ') }}</td>
-                                    <td class="text-end">{{ item.getTax()|number_format(0, '.', ' ') }}</td>
-                                    <td class="text-end">{{ item.getCount()|number_format(2, '.', ' ') }}</td>
-                                    <td class="text-end">{{ item.getTotalCalculated()|number_format(2, '.', ' ') }}</td>
+                                    <td class="text-end">{{ item.totalPrice()|number_format(2, '.', ' ') }}</td>
+                                    <td class="text-end">{{ item.totalDiscount()|number_format(2, '.', ' ') }}</td>
+                                    <td class="text-end">{{ item.totalTax()|number_format(2, '.', ' ') }}</td>
+                                    <td class="text-end">{{ item.totalCount()|number_format(2, '.', ' ') }}</td>
+                                    <td class="text-end">{{ item.totalSum()|number_format(2, '.', ' ') }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -103,17 +103,17 @@
                         <tfoot>
                             <tr>
                                 <th colspan="5">Discount</th>
-                                <td class="text-end">{{ order.getTotalDiscount()|number_format(2, '.', ' ') }}</td>
+                                <td class="text-end">{{ order.totalDiscount()|number_format(2, '.', ' ') }}</td>
                             </tr>
 
                             <tr>
                                 <th colspan="5">Tax</th>
-                                <td class="text-end">{{ order.getTotalTax()|number_format(2, '.', ' ') }}</td>
+                                <td class="text-end">{{ order.totalTax()|number_format(2, '.', ' ') }}</td>
                             </tr>
 
                             <tr>
                                 <th colspan="5">Total</th>
-                                <td class="text-end">{{ order.getTotalPriceCalculated()|number_format(2, '.', ' ') }}</td>
+                                <td class="text-end">{{ order.totalSum()|number_format(2, '.', ' ') }}</td>
                             </tr>
                         </tfoot>
                     </table>

@@ -49,9 +49,8 @@
                                         <div class="feed-desc">
                                             <a class="feed-img" href="/{{ publication.address }}">
                                                 {% set category = categories.firstWhere('uuid', publication.category) %}
-                                                {% set obj = publication.hasFiles() ? publication: category %}
                                                 {% include 'mixin/img.twig' with {
-                                                    'src': obj.hasFiles() ? obj.getFiles().first().getPublicPath('small') : 'https://via.placeholder.com/100x100',
+                                                    'src': publication.images.first().public_path('middle') ?? category.images.first().public_path('middle') ?? '/assets/img/no_image.png',
                                                     'alt': 'thumb',
                                                 } only %}
                                             </a>

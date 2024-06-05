@@ -1,14 +1,14 @@
 {% for node in categories.where('parent_uuid', '=', parent ?? null).sortBy('order') %}
     {% if categories.where('parent_uuid', '=', node.uuid).sortBy('order').count() %}
         <li>
-            <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ node.address }}">{{ node.title }} <i class="lni lni-chevron-right"></i></a>
+            <a href="/catalog/{{ node.address }}">{{ node.title }} <i class="lni lni-chevron-right"></i></a>
             <ul class="inner-sub-category">
                 {% include 'common/header-navigation-item.twig' with {'categories':categories,'parent':node.uuid} only %}
             </ul>
         </li>
     {% else %}
         <li>
-            <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ node.address }}">{{ node.title }}</a>
+            <a href="/catalog/{{ node.address }}">{{ node.title }}</a>
         </li>
     {% endif %}
 {% endfor %}

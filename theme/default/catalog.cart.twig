@@ -122,7 +122,7 @@
                 <div class="col-md-12 text-center">
                     <h3 class="pb-3">Your cart is still empty, why?</h3>
                     <p>
-                        Check out our <a href="/{{ parameter('catalog_address', 'catalog') }}">catalog</a>,
+                        Check out our <a href="/catalog">catalog</a>,
                         you might like something!
                     </p>
                 </div>
@@ -157,7 +157,7 @@
                                                     'type': 'text',
                                                     'name': 'delivery[client]',
                                                     'args': {
-                                                        'value': user.getName(),
+                                                        'value': user.name(),
                                                         'required': true,
                                                         'class': ['form-control'],
                                                         'data': {'catalog-cart-data': ''}
@@ -172,7 +172,7 @@
                                                     'type': 'email',
                                                     'name': 'email',
                                                     'args': {
-                                                        'value': user.getEmail(),
+                                                        'value': user.email,
                                                         'class': ['form-control'],
                                                         'data': {'catalog-cart-data': ''}
                                                     }
@@ -186,7 +186,7 @@
                                                     'type': 'tel',
                                                     'name': 'phone',
                                                     'args': {
-                                                        'value': user.getPhone(),
+                                                        'value': user.phone,
                                                         'required': true,
                                                         'class': ['form-control'],
                                                         'data': {'catalog-cart-data': ''}
@@ -282,8 +282,7 @@
                                                     'type': 'textarea',
                                                     'name': 'delivery[address][2]',
                                                     'args': {
-                                                        'value': user.getAddress(),
-                                                        'required': true,
+                                                        'value': user.address,
                                                         'placeholder': 'Delivery address',
                                                         'style': 'height: 105px; margin-bottom: 16px;',
                                                         'class': ['form-control'],
@@ -299,7 +298,7 @@
                                                     'type': 'datetime',
                                                     'name': 'shipping',
                                                     'args': {
-                                                        'value': 'now'|date_modify('+1 day')|df('d.m.Y, H:00'),
+                                                        'value': 'now'|date_modify('+1 day')|df('Y-m-d\\TH:00'),
                                                         'placeholder': 'Datetime shipping',
                                                         'class': ['form-control'],
                                                         'data': {'catalog-cart-data': ''}

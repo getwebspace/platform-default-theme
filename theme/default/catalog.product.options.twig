@@ -3,13 +3,15 @@
     <div style="display: none;">
         <span data-catalog-item-attr="uuid">{{ product.uuid }}</span>
         <span data-catalog-item-attr="title">{{ product.title }}</span>
-        <span data-catalog-item-attr="url">/{{ parameter('catalog_address', 'catalog') }}/{{ product.address }}</span>
-        <span data-catalog-item-attr="thumb">{{ product.hasFiles() ? product.getFiles().first().getPublicPath('middle') : 'https://via.placeholder.com/220x200' }}</span>
+        <span data-catalog-item-attr="url">/catalog/{{ product.address }}</span>
+        <span data-catalog-item-attr="thumb">{{ product.images.first().public_path('middle') ?? '/assets/img/no_image.png' }}</span>
         <span data-catalog-item-attr="vendorcode">{{ product.vendorcode }}</span>
-        <span data-catalog-item-attr="price">{{ product.getPriceCalculated('price') }}</span>
-        <span data-catalog-item-attr="price_wholesale">{{ product.getPriceCalculated('price_wholesale') }}</span>
+        <span data-catalog-item-attr="price">{{ product.price('price') }}</span>
+        <span data-catalog-item-attr="price_wholesale">{{ product.price('price_wholesale') }}</span>
         <span data-catalog-item-attr="price_wholesale_from">{{ product.priceWholesaleFrom }}</span>
         <span data-catalog-item-attr="price_type">{{ catalog_product_price_type() }}</span>
+        <span data-catalog-item-attr="tax">{{ product.tax }}</span>
+        <span data-catalog-item-attr="tax_included">{{ product.tax_included }}</span>
         <span data-catalog-item-attr="quantity_step">{{ product.quantity }}</span>
         <span data-catalog-item-attr="quantity_min">{{ product.quantityMin }}</span>
 
