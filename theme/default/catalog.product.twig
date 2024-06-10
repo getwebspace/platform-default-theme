@@ -164,8 +164,8 @@
                                     {% if product.vendorcode %}<li><span>Vendorcode:</span> {{ product.vendorcode }}</li>{% endif %}
                                     {% if product.barcode %}<li><span>Barcode:</span> {{ product.barcode }}</li>{% endif %}
                                     {% if product.dimension.weight_class %}<li><span>Volume:</span> {{ product.weightWithClass() }}</li>{% endif %}
-                                    {% if product.tax %}<li><span>Stock</span>: {{ product.stock > 0 ? '<span>In stock</span>' : '<span>Out of stock</span>' }}</li>{% endif %}
-                                    {% if product.stock %}<li><span>Tax</span>: {{ product.tax }}</li>{% endif %}
+                                    {% if product.stock %}<li><span>Stock</span>: {{ product.stock > 0 ? '<span>In stock</span>' : '<span>Out of stock</span>' }}</li>{% endif %}
+                                    {% if product.tax %}<li><span>Tax</span>: {{ product.tax }}</li>{% endif %}
                                     {% if product.dimension.length_class %}<li><span>Dimension</span>: {{ product.specificationWithClass() }}</li>{% endif %}
                                 </ul>
                             </div>
