@@ -25,13 +25,12 @@
                         <div class="post-details">
                             <div class="main-content-head">
                                 <div class="post-thumbnils">
-                                    {% include 'mixin/img.twig' with {
-                                        'src': publication.images.first().public_path('middle') ?? '/assets/img/no_image.png',
-                                        'placeholder': publication.images.first().public_path('small') ?? '/assets/img/no_image.png',
+                                    {% include 'mixin/picture.twig' with {
+                                        'file': publication.images.first(),
                                         'title': publication.title,
                                         'alt': publication.title,
                                         'style': 'display:block; height: 460px; width: 100%; object-fit: cover; object-position: center center;'
-                                    } only %}
+                                    } %}
                                 </div>
                                 <div class="meta-information">
                                     <h2 class="post-title">

@@ -69,22 +69,21 @@
                         <div class="product-images">
                             <main id="gallery">
                                 <div class="main-img">
-                                    {% include 'mixin/img.twig' with {
-                                        'src': product.images.first().public_path('middle') ?? '/assets/img/no_image.png',
-                                        'placeholder': product.images.first().public_path('small') ?? '/assets/img/no_image.png',
+                                    {% include 'mixin/picture.twig' with {
+                                        'file': product.images.first(),
                                         'id': 'current',
                                         'title': product.title,
                                         'alt': product.title,
-                                    } only %}
+                                    } %}
                                 </div>
                                 <div class="images">
                                     {% for index, file in product.images %}
                                         <a href="{{ file.public_path('full') }}" data-fancybox="group" class="img">
-                                            {% include 'mixin/img.twig' with {
-                                                'src': file.public_path('full'),
+                                            {% include 'mixin/picture.twig' with {
+                                                'file': file,
                                                 'title': product.title,
                                                 'alt': product.title ~ ' ' ~ index
-                                            } only %}
+                                            } %}
                                         </a>
                                     {% endfor %}
                                 </div>

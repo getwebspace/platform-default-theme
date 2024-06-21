@@ -22,12 +22,12 @@
                             {% endfor %}
                         </ul>
                         <div class="images">
-                            {% include 'mixin/img.twig' with {
-                                'src': category.images.first().public_path('middle') ?? '/assets/img/no_image.png',
+                            {% include 'mixin/picture.twig' with {
+                                'file': product.images.first(),
                                 'title': category.title,
                                 'alt': category.title,
                                 'style': 'height: 100%; width: 180px; object-fit: contain;'
-                            } only %}
+                            } %}
                         </div>
                     </div>
                     <!-- End Single Category -->

@@ -49,10 +49,10 @@
                                         <div class="feed-desc">
                                             <a class="feed-img" href="/{{ publication.address }}">
                                                 {% set category = categories.firstWhere('uuid', publication.category) %}
-                                                {% include 'mixin/img.twig' with {
-                                                    'src': publication.images.first().public_path('middle') ?? category.images.first().public_path('middle') ?? '/assets/img/no_image.png',
-                                                    'alt': 'thumb',
-                                                } only %}
+                                                {% include 'mixin/picture.twig' with {
+                                                    'file': publication.images.first() ?? category.images.first(),
+                                                    'alt': 'thumb'
+                                                } %}
                                             </a>
                                             <h6 class="post-title"><a href="/{{ publication.address }}" title="{{ publication.title }}">{{ publication.title }}</a></h6>
                                             <span class="time"><i class="lni lni-calendar"></i> {{ publication.date|df }}</span>

@@ -3,12 +3,12 @@
     <div class="row align-items-center">
         <div class="col-lg-4 col-md-4 col-12">
             <div class="product-image">
-                {% include 'mixin/img.twig' with {
-                    'src': product.images.first().public_path('middle') ?? '/assets/img/no_image.png',
+                {% include 'mixin/picture.twig' with {
+                    'file': product.images.first(),
                     'title': product.title,
                     'alt': product.title,
                     'style': 'height: 288px;'
-                } only %}
+                } %}
 
                 {% if product.discount %}
                     <span class="sale-tag">$&dash;{{ product.discount }}</span>

@@ -64,13 +64,12 @@
                                     <div class="row my-3">
                                         <div class="col-2 text-center">
                                             <a href="/{{ item.address }}">
-                                                {% include 'mixin/img.twig' with {
-                                                    'src': item.images.first().public_path('middle') ?? '/assets/img/no_image.png',
-                                                    'placeholder': item.images.first().public_path('small') ?? '/assets/img/no_image.png',
+                                                {% include 'mixin/picture.twig' with {
+                                                    'file': item.images.first(),
                                                     'title': item.title,
                                                     'alt': item.title,
                                                     'style': 'display:block; float: left; margin: 0 auto; height: 50px; width: 50px; object-fit: cover; object-position: center center;'
-                                                } only %}
+                                                } %}
                                             </a>
                                         </div>
                                         <div class="col-10">
