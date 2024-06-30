@@ -111,6 +111,10 @@
                                     ${{ price }}
                                 {% endif %}
                             </h3>
+                            {% set lowest_price = product.price_lowest() %}
+                            {% if lowest_price %}
+                                <small>Lowest Price in the Last 30 Days: ${{ product.price_lowest() }}</small>
+                            {% endif %}
 
                             {% if product.extra %}
                                 <p class="info-text">{{ product.extra|raw }}</p>
