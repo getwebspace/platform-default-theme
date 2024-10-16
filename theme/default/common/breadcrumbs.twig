@@ -19,9 +19,16 @@
 
                     {% for item in parents|reverse() %}
                         {% if item.title %}
-                            <li>
-                                <a href="/catalog/{{ item.address }}">{{ item.title }}</a>
-                            </li>
+                            {% if item is instanceof('\\App\\Domain\\Models\\CatalogCategory') %}
+                                <li>
+                                    <a href="/catalog/{{ item.address }}">{{ item.title }}</a>
+                                </li>
+                            {% endif %}
+                            {% if item is instanceof('\\App\\Domain\\Models\\PublicationCategory') %}
+                                <li>
+                                    <a href="/{{ item.address }}">{{ item.title }}</a>
+                                </li>
+                            {% endif %}
                         {% else %}
                             <li>{{ item }}</li>
                         {% endif %}
