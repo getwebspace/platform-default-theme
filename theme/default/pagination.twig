@@ -6,7 +6,7 @@
         <ul class="pagination-list">
             {% for page in 0..pages-1 %}
                 <li class="{{ is_current_page_number(page) ? 'active' : '' }}">
-                    <a href="{{ non_page_path() }}{{ page ? '/' ~ page : '' }}{{ current_query() }}">{{ page + 1 }}</a>
+                    <a href="{{ non_page_path() }}{{ page ? '/' ~ (page + 1) : '' }}{{ current_query() }}">{{ page + 1 }}</a>
                 </li>
             {% endfor %}
         </ul>
