@@ -17,7 +17,7 @@
                             <h3>No Account? Register</h3>
                             <p>Registration takes less than a minute but gives you full control over your orders.</p>
                         </div>
-                        <form class="row" method="post">
+                        <form class="row" method="post" data-grecaptcha>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     {% include 'mixin/form.twig' with {
@@ -84,4 +84,6 @@
         </div>
     </div>
     <!-- End Account Area -->
+
+    {% include 'mixin/recaptcha.twig' %}
 {% endblock %}

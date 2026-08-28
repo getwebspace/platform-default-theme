@@ -1,0 +1,82 @@
+{% extends 'main.twig' %}
+
+{% block title %}E-Mail confirmation | {{ parent() }}{% endblock %}
+
+{% block page %}
+    {% include 'common/breadcrumbs.twig' with {
+        'title': 'E-Mail confirmation'
+    } %}
+
+    <!-- Start Account Area -->
+    <div class="account-login section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 offset-lg-3 col-md-10 offset-md-1 col-12">
+
+                    {# just registered, or asked for the letter again #}
+                    {% if stage == 'sent' %}
+                        <div class="card login-form">
+                            <div class="card-body">
+                                <div class="title">
+                                    <h3>Confirm your e-mail</h3>
+                                    <p>
+                                        We have sent you a letter with a confirmation link.
+                                        Open it to finish the registration - until then the account cannot log in.
+                                    </p>
+                                </div>
+                                <p class="outer-link">Letter did not arrive? <a href="/user/confirm">Send it again</a></p>
+                            </div>
+                        </div>
+
+                    {# the link is expired, already used, or tampered with #}
+                    {% elseif stage == 'expired' %}
+                        <div class="card login-form">
+                            <div class="card-body">
+                                <div class="title">
+                                    <h3>This link no longer works</h3>
+                                    <p>
+                                        Confirmation links expire after a day and stop working once the
+                                        address has been confirmed. If the account is already active, just log in.
+                                    </p>
+                                </div>
+                                <p class="outer-link"><a href="/user/confirm">Send a new link</a></p>
+                                <p class="outer-link"><a href="/user/login">Back to login</a></p>
+                            </div>
+                        </div>
+
+                    {# ask who needs the letter resent #}
+                    {% else %}
+                        <form class="card login-form" method="post" data-grecaptcha>
+                            <div class="card-body">
+                                <div class="title">
+                                    <h3>Send the confirmation link again</h3>
+                                    <p>Enter the e-mail, username or phone you registered with.</p>
+                                </div>
+
+                                {% include 'mixin/form.twig' with {
+                                    'label': 'E-Mail, username or phone',
+                                    'type': 'text',
+                                    'name': 'identifier',
+                                    'args': {
+                                        'required': true,
+                                        'autofocus': true
+                                    }
+                                } %}
+
+                                <div class="button">
+                                    <button class="btn" type="submit">Send the link</button>
+                                </div>
+
+                                <p class="outer-link">Already confirmed? <a href="/user/login">Login here</a></p>
+                            </div>
+                        </form>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Account Area -->
+
+    {% include 'mixin/recaptcha.twig' %}
+{% endblock %}

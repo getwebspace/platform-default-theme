@@ -12,7 +12,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-6 offset-lg-3 col-md-10 offset-md-1 col-12">
-                    <form class="card login-form" method="post">
+                    <form class="card login-form" method="post" data-grecaptcha>
                         <div class="card-body">
                             <div class="title">
                                 <h3>Login Now</h3>
@@ -48,6 +48,7 @@
                             <div class="button">
                                 <button class="btn" type="submit">Login</button>
                             </div>
+                            <p class="outer-link"><a href="/user/recovery">Forgot your password?</a></p>
                             <p class="outer-link">Don't have an account? <a href="/user/register">Register here</a></p>
 
                             {% if oauth|count %}
@@ -66,4 +67,6 @@
         </div>
     </div>
     <!-- End Account Area -->
+
+    {% include 'mixin/recaptcha.twig' %}
 {% endblock %}

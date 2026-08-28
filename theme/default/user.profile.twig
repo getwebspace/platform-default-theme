@@ -17,7 +17,28 @@
                             <li>
                                 <h6 class="title" data-bs-toggle="collapse" data-bs-target="#collapse-profile" aria-expanded="true" aria-controls="collapse-profile">Account Details </h6>
                                 <section class="checkout-steps-form-content collapse show" id="collapse-profile" aria-labelledby="headingThree" data-bs-parent="#accordion">
-                                    <form method="post" class="contact-form" data-grecaptcha>
+                                    <form method="post" enctype="multipart/form-data" class="contact-form" data-grecaptcha>
+
+                                        {% include 'mixin/form.twig' with {
+                                            'type': 'file',
+                                            'name': 'files[]',
+                                            'args': {
+                                                'id': 'profile-image',
+                                                'accept': 'image/*',
+                                                'class': 'profile-form__file-input'
+                                            }
+                                        } %}
+
+                                        {% include 'mixin/form.twig' with {
+                                            'type': 'hidden',
+                                            'name': 'username',
+                                            'args': {
+                                                'value': user.username,
+                                            }
+                                        } %}
+
+                                        {{ pre(user.files.pluck('name')) }}
+
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="single-form form-default">
