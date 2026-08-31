@@ -55,6 +55,17 @@
                                 </div>
                             </div>
                         </div>
+
+                        {% if parameter('review_publication_is_enabled', 'no') == 'yes' %}
+                            {% include 'components/reviews.twig' with {
+                                'type': 'review',
+                                'heading': 'Reviews',
+                                'action': '/publication/' ~ publication.uuid ~ '/review',
+                                'items': publication.reviews.where('status', 'work'),
+                                'with_rating': true,
+                                'user': user,
+                            } only %}
+                        {% endif %}
                     </div>
                 </div>
             </div>

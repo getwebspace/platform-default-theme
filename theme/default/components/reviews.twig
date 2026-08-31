@@ -1,0 +1,200 @@
+{#
+    Reviews / questions block for a publication or a catalog product.
+
+    Params:
+      heading     - section title
+      type        - 'review' | 'question'
+      action      - POST endpoint, e.g. '/catalog/{uuid}/review'
+      items       - collection of approved top-level entries (status = work)
+      with_rating - show the 1..5 star control / values (reviews only)
+      user        - current user (global), form is shown only when signed in
+#}
+{% set fid = 'js-review-form-' ~ type ~ '-' ~ random(99999) %}
+{% set list = (items ?? [])|default([]) %}
+{% set is_q = type == 'question' %}
+
+<div class="reviews-block my-5" id="{{ fid }}-wrap">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-lg-5">
+
+            <div class="d-flex align-items-center mb-4">
+                <h3 class="h4 mb-0">
+                    <i class="fas {{ is_q ? 'fa-circle-question' : 'fa-star' }} text-warning me-2"></i>
+                    {{ heading|default(is_q ? 'Questions' : 'Reviews') }}
+                </h3>
+                {% if list.count() %}
+                    <span class="badge bg-primary rounded-pill ms-2 align-self-start">{{ list.count() }}</span>
+                {% endif %}
+            </div>
+
+            {# ---------- existing entries ---------- #}
+            {% if list.count() %}
+                <div class="vstack gap-3 mb-4">
+                    {% for item in list.sortByDesc('date') %}
+                        <div class="review-item">
+                            <div class="d-flex">
+                                <div class="review-avatar flex-shrink-0">
+                                    {{ (item.user ? item.user.name('short') : 'U')|slice(0, 1)|upper }}
+                                </div>
+                                <div class="ms-3 flex-grow-1 min-w-0">
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                        <span class="fw-bold">{{ item.user ? item.user.name('short') : 'User' }}</span>
+
+                                        {% if with_rating and item.type == 'review' and item.rating %}
+                                            <span class="review-stars" title="{{ item.rating }} / 5">
+                                                {% for i in 1..5 %}<i class="fa{{ i <= item.rating ? 's' : 'r' }} fa-star"></i>{% endfor %}
+                                            </span>
+                                        {% endif %}
+
+                                        <span class="text-muted small ms-sm-auto">{{ item.date|df }}</span>
+                                    </div>
+
+                                    <p class="mb-0 mt-1">{{ item.message|e|nl2br }}</p>
+
+                                    {% for answer in item.children.where('status', 'work').sortBy('date') %}
+                                        <div class="review-answer mt-2">
+                                            <div class="fw-semibold small mb-1">
+                                                <i class="fas fa-reply me-1"></i>
+                                                {{ answer.user ? answer.user.name('short') : 'Support' }}
+                                            </div>
+                                            <div>{{ answer.message|e|nl2br }}</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center text-muted py-4 mb-2">
+                    <i class="fas {{ is_q ? 'fa-comments' : 'fa-star' }} fa-2x d-block mb-2 opacity-25"></i>
+                    {{ is_q ? 'No questions yet. Be the first to ask.' : 'No reviews yet. Be the first to review.' }}
+                </div>
+            {% endif %}
+
+            <hr class="my-4">
+
+            {# ---------- new entry form ---------- #}
+            {% if user %}
+                <h4 class="h5 mb-3">{{ is_q ? 'Ask a question' : 'Write a review' }}</h4>
+
+                <form method="post" action="{{ action }}" enctype="multipart/form-data" class="reviews-form row g-3" id="{{ fid }}">
+                    {% if with_rating and not is_q %}
+                        <div class="col-sm-5 col-md-4">
+                            {% include 'mixin/form.twig' with {
+                                'label': 'Rating',
+                                'type': 'select',
+                                'name': 'rating',
+                                'args': {
+                                    'class': ['form-select'],
+                                    'option': {'5': '5 — Excellent', '4': '4 — Good', '3': '3 — Okay', '2': '2 — Poor', '1': '1 — Bad'},
+                                    'selected': '5',
+                                }
+                            } only %}
+                        </div>
+                    {% endif %}
+
+                    <div class="col-12">
+                        {% include 'mixin/form.twig' with {
+                            'label': is_q ? 'Your question' : 'Your review',
+                            'type': 'textarea',
+                            'name': 'message',
+                            'args': {
+                                'required': true,
+                                'rows': 4,
+                                'placeholder': is_q ? 'Ask about this product…' : 'Share your experience…',
+                            }
+                        } only %}
+                    </div>
+
+                    {% if parameter('file_is_enabled', 'yes') == 'yes' %}
+                        <div class="col-12">
+                            {% include 'mixin/form.twig' with {
+                                'label': 'Attachments',
+                                'type': 'file',
+                                'name': 'files[]',
+                                'args': {'multiple': true, 'class': ['form-control']}
+                            } only %}
+                        </div>
+                    {% endif %}
+
+                    <div class="col-12">
+                        <button class="btn btn-alt px-4" type="submit">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            {{ is_q ? 'Send question' : 'Send review' }}
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="alert alert-light border d-flex align-items-center mb-0">
+                    <i class="fas fa-circle-info fa-lg text-primary me-3"></i>
+                    <div>
+                        <a href="/user/login" class="alert-link">Sign in</a>
+                        {{ is_q ? 'to ask a question.' : 'to leave a review.' }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .reviews-block .review-avatar {
+        width: 44px; height: 44px; border-radius: 50%;
+        background: #0167F3; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 600; font-size: 1rem; line-height: 1;
+    }
+    .reviews-block .review-stars { color: #f5a623; letter-spacing: 2px; white-space: nowrap; }
+    .reviews-block .review-item + .review-item { border-top: 1px solid #eef0f3; padding-top: 1rem; }
+    .reviews-block .review-answer {
+        background: #f6f8fb; border-left: 3px solid #0167F3;
+        border-radius: .375rem; padding: .6rem .9rem;
+    }
+    .reviews-block .min-w-0 { min-width: 0; }
+    .reviews-block .reviews-form textarea.form-control { min-height: 120px; }
+</style>
+
+{% if user %}
+<script>
+    (function () {
+        var form = document.getElementById('{{ fid }}');
+        if (!form || form.dataset.bound) return;
+        form.dataset.bound = '1';
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            var btn = form.querySelector('button[type="submit"]');
+            var data = new FormData(form);
+
+            if (typeof grecaptcha !== 'undefined' && grecaptcha.getToken) {
+                try { data.append('recaptcha', await grecaptcha.getToken()); } catch (err) {}
+            }
+
+            btn.disabled = true;
+
+            $.ajax({
+                url: form.getAttribute('action'),
+                type: 'POST',
+                data: data,
+                contentType: false,
+                processData: false,
+                cache: false,
+            }).done(function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thank you!',
+                    text: 'Your message was sent and will appear after moderation.',
+                }).then(function () { location.reload(); });
+            }).fail(function (xhr) {
+                var msg = (xhr.responseJSON && (xhr.responseJSON.error || xhr.responseJSON.message))
+                    || (xhr.status === 403 ? 'Please sign in to continue.' : 'Something went wrong, try again later.');
+                Swal.fire({icon: 'error', title: 'Error', text: msg});
+            }).always(function () {
+                btn.disabled = false;
+            });
+        });
+    })();
+</script>
+{% endif %}

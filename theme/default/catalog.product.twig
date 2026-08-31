@@ -201,6 +201,28 @@
                     </div>
                 </div>
             </div>
+
+            {% if parameter('review_product_is_enabled', 'no') == 'yes' %}
+                {% include 'components/reviews.twig' with {
+                    'type': 'review',
+                    'heading': 'Customer reviews',
+                    'action': '/catalog/' ~ product.uuid ~ '/review',
+                    'items': product.reviews.where('status', 'work'),
+                    'with_rating': true,
+                    'user': user,
+                } only %}
+            {% endif %}
+
+            {% if parameter('review_question_product_is_enabled', 'no') == 'yes' %}
+                {% include 'components/reviews.twig' with {
+                    'type': 'question',
+                    'heading': 'Questions & answers',
+                    'action': '/catalog/' ~ product.uuid ~ '/question',
+                    'items': product.questions.where('status', 'work'),
+                    'with_rating': false,
+                    'user': user,
+                } only %}
+            {% endif %}
         </div>
     </section>
     <!-- End Item Details -->
