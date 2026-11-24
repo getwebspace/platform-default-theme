@@ -808,3 +808,6 @@ and `p500` (in `theme/default` they are minimal).
   (`common_auto_generate_address`) is shared by the products of one category
   with one title and made unique (vendor code / external id suffix, then a
   counter) for any other product that would collide.
+- **The admin panel edits variants** on the *Variants* tab of the product
+  form (siblings by address, "Add variant" starts a copy). Reference
+  `description`/`kind` are in the REST API and the MCP tools too.
