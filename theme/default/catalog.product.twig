@@ -6,6 +6,8 @@
     {{ parent() }}
     <meta name="description" content="{{ product.meta.description }}">
     <meta name="keywords" content="{{ product.meta.keywords }}">
+    {# the address without ?v= : every variant is one page for the search engines #}
+    <link rel="canonical" href="{{ parameter('common_homepage') }}{{ product.canonical_url() }}">
 {% endblock %}
 
 {% block page %}
@@ -120,6 +122,14 @@
                                 <p class="info-text">{{ product.extra|raw }}</p>
                             {% endif %}
 
+                            {% if products|length > 1 %}
+                                <div class="variants mb-3">
+                                    {% for variant in products %}
+                                        <a href="{{ variant.url() }}" class="btn btn-sm {{ variant.uuid == product.uuid ? 'btn-primary' : 'btn-outline-secondary' }}">{{ variant.variant_label() }}</a>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
                             <div class="bottom-content">
                                 <div class="row align-items-end">
                                     <div class="col-lg-4 col-md-4 col-12">
@@ -192,7 +202,7 @@
                                         {% for relative in product.relations %}
                                             <li>
                                                 <span>
-                                                    <a href="/catalog/{{ relative.address }}">
+                                                    <a href="{{ relative.url() }}">
                                                         {{ relative.title }}
                                                     </a>
                                                 </span>: ${{ relative.price(catalog_product_price_type()) }} &times; {{ relative.pivot.count }} &equals; ${{ relative.price * relative.pivot.count }}

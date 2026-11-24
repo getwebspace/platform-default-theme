@@ -163,12 +163,18 @@ via the JSON `template` field (see the `CatalogCategory`,
 - **Variables:** `categories`, `category` (`CatalogCategory`),
   `products` (same structure), `pagination`
 
-**Product** (`/catalog/<category>/<product-address>`):
-- **Template:** `product.category.template['product']`
+**Product** (`/catalog/<category>/<product-address>[?v=<variant>]`):
+- **Template:** `product.category.template['product']` — of the *chosen* variant
 - **Variables:**
-  - `categories`, `category` (the product's category)
-  - `products` — Collection (result of `read` by address)
-  - `product` — the `CatalogProduct` model
+  - `categories`, `category` (the category of the chosen variant — a shared
+    address may be used in different categories)
+  - `products` — **the variants**: every `status=work` product of the address
+    in shown categories, always in the order `order`, `title`, `external_id`,
+    `uuid`
+  - `product` — the chosen variant: `?v=` is compared with `external_id`,
+    then with `uuid`, inside the group only; no `v`, an empty or unknown one,
+    one of another group or a list (`?v[]=`) give the first of `products`
+  - `v` is not an attribute filter
   - `params` — `{ address, offset }`
 - **Errors:** `p404.twig`
 
@@ -428,6 +434,20 @@ adds computed keys for many models — they are listed below as "in toArray".
   - `attribute(address, default=null)` — the product's attribute value (typed)
   - `specification()` / `specificationWithClass()` — `L×W×H` (+ length class)
   - `weight()` / `weightWithClass()`
+- **Variants** (`variant_title`, `has_variants()`, `variants()`, `url()`,
+  `canonical_url()`, `variant_label()`): products that share an address are
+  variants of one product. `has_variants()` — other `work` products of the
+  address (one query per page: the groups of all the products read are fetched
+  together). `variants()` — the group in the fixed order, shown categories only,
+  with `files`. `url()` — `/catalog/<address>`, plus `?v=<external_id>` (the
+  uuid without one, `rawurlencode`d) when the address is shared; the prefix is
+  the parameter `catalog_address`. `canonical_url()` — the same without `?v=`:
+  **a theme puts it into `rel="canonical"`**. `variant_label()` — `variant_title`,
+  else the attribute that is filled for the whole group with different values,
+  else the vendor code, else the external id. In `toArray`: `url`,
+  `canonical_url`, `variant_label` (and the column `variant_title`).
+  The search puts the prefix into `address` through `prefixAddress()`; the
+  methods above keep it out of the link.
 - **Stock status:** `stock_status_uuid` and the relation `stockStatus`
   (a `Reference` of type `stock_status`, `null` if none). In `toArray` the
   key `stock_status` (`uuid`, `title`) is present only when the relation was
@@ -578,7 +598,8 @@ Everything is registered in `App\Application\TwigExtension`
 | `catalog_attribute(criteria={}, order={})` | catalog attributes | Collection |
 | `catalog_order(criteria={}, order={'date':'desc'}, limit=10, offset=null)` | orders | Collection\|CatalogOrder |
 | `catalog_category_tree(root=null)` | the shown categories as a tree; `root` is a category uuid or address (top level by default). Node: `category`, `uuid`, `title`, `address`, `image` (first image `File` or `null`), `own_count`, `count` (what the category page lists: nested products only where `is_allow_nested`), `children`. A hidden category takes its branch with it. Two queries for the whole tree | array |
-| `catalog_product_bought_together(product, limit=4)` | products found in the same orders as `product` (model or uuid), the most frequent first, each with `together` (shared orders). Only `status=work`, `type=product`, shown categories; never the product itself; orders whose status has `kind=canceled` are not counted. Empty for `null` | Collection |
+| `catalog_product_variants(product)` | variants of a product (model or uuid): `product.variants()`; empty for `null` or an unknown uuid | Collection |
+| `catalog_product_bought_together(product, limit=4)` | products found in the same orders as `product` (model or uuid), the most frequent first, each with `together` (shared orders). Only `status=work`, `type=product`, shown categories; never the product itself or its variants (same address); orders whose status has `kind=canceled` are not counted. Empty for `null` | Collection |
 | `catalog_product_popular(limit=10, type='product')` | top by number of orders | Collection |
 | `catalog_product_view(uuid=null, limit=10)` | writes uuid into the "viewed" session list and/or returns the list | array |
 | `catalog_product_price_type()` | `needs_context` — price type for the current user (`price` or from `catalog_price_type`) | string |

@@ -23,7 +23,7 @@
     <div class="product-info">
         <span class="category">{{ product.category.title }}</span>
         <h4 class="title">
-            <a href="/catalog/{{ product.address }}">{{ product.title }}</a>
+            <a href="{{ product.url() }}">{{ product.title }}</a>
         </h4>
         <div class="price">
             <span>${{ product.price(catalog_product_price_type()) }}</span>
