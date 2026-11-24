@@ -115,6 +115,17 @@
             </div>
         </div>
     </div>
+    {% set requisite = reference('requisite')|first %}
+    {% if requisite %}
+        <div class="container">
+            <p class="text-muted small mb-2">
+                {{ requisite.value.legal_name ?: requisite.title }}
+                {% if requisite.value.tax_id %}, Tax ID {{ requisite.value.tax_id }}{% endif %}
+                {% if requisite.value.reg_id %}, Reg. no. {{ requisite.value.reg_id }}{% endif %}
+                {% if requisite.value.address %}, {{ requisite.value.address }}{% endif %}
+            </p>
+        </div>
+    {% endif %}
     <!-- End Footer Middle -->
     <!-- Start Footer Bottom -->
     <div class="footer-bottom">

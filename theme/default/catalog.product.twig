@@ -167,7 +167,11 @@
                                     {% if product.vendorcode %}<li><span>Vendorcode:</span> {{ product.vendorcode }}</li>{% endif %}
                                     {% if product.barcode %}<li><span>Barcode:</span> {{ product.barcode }}</li>{% endif %}
                                     {% if product.dimension.weight_class %}<li><span>Volume:</span> {{ product.weightWithClass() }}</li>{% endif %}
-                                    {% if product.stock %}<li><span>Stock</span>: {{ product.stock > 0 ? '<span>In stock</span>' : '<span>Out of stock</span>' }}</li>{% endif %}
+                                    {% if product.stockStatus %}
+                                        <li><span>Availability</span>: {{ product.stockStatus.title }}</li>
+                                    {% elseif product.stock %}
+                                        <li><span>Stock</span>: {{ product.stock > 0 ? '<span>In stock</span>' : '<span>Out of stock</span>' }}</li>
+                                    {% endif %}
                                     {% if product.tax %}<li><span>Tax</span>: {{ product.tax }}</li>{% endif %}
                                     {% if product.dimension.length_class %}<li><span>Dimension</span>: {{ product.specificationWithClass() }}</li>{% endif %}
                                 </ul>
@@ -201,6 +205,20 @@
                     </div>
                 </div>
             </div>
+
+            {% set together = catalog_product_bought_together(product, 4) %}
+            {% if together.count() %}
+                <div class="container mt-5">
+                    <h4>Bought together</h4>
+                    <div class="row">
+                        {% for item in together %}
+                            <div class="col-lg-3 col-md-6 col-12">
+                                {% include 'catalog.category.product.grid.twig' with {'categories': categories, 'product': item} only %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
 
             {% if parameter('review_product_is_enabled', 'no') == 'yes' %}
                 {% include 'components/reviews.twig' with {

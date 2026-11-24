@@ -11,24 +11,26 @@
             </div>
         </div>
         <div class="row">
-            {% for category in catalog_category({'parent_uuid': null}) %}
+            {% for node in catalog_category_tree() %}
                 <div class="col-lg-4 col-md-6 col-12">
                     <!-- Start Single Category -->
                     <div class="single-category" style="min-height: 184px;">
-                        <h3 class="heading">{{ category.title }}</h3>
+                        <h3 class="heading"><a href="/catalog/{{ node.address }}">{{ node.title }}</a> <small>({{ node.count }})</small></h3>
                         <ul>
-                            {% for sub in catalog_category({'parent_uuid': category.uuid}) %}
-                                <li><a href="/catalog/{{ sub.address }}">{{ sub.title }}</a></li>
+                            {% for sub in node.children %}
+                                <li><a href="/catalog/{{ sub.address }}">{{ sub.title }}</a> ({{ sub.count }})</li>
                             {% endfor %}
                         </ul>
-                        <div class="images">
-                            {% include 'mixin/picture.twig' with {
-                                'file': product.images.first(),
-                                'title': category.title,
-                                'alt': category.title,
-                                'style': 'height: 100%; width: 180px; object-fit: contain;'
-                            } %}
-                        </div>
+                        {% if node.image %}
+                            <div class="images">
+                                {% include 'mixin/picture.twig' with {
+                                    'file': node.image,
+                                    'title': node.title,
+                                    'alt': node.title,
+                                    'style': 'height: 100%; width: 180px; object-fit: contain;'
+                                } %}
+                            </div>
+                        {% endif %}
                     </div>
                     <!-- End Single Category -->
                 </div>

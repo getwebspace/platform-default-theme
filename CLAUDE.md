@@ -198,8 +198,10 @@ iterating it in a template on a big catalog.
   only existing products with `status=work` and `count > 0`. The price is the
   catalog one; `price_wholesale` is applied only when `count >=
   priceWholesaleFrom` (whatever the client asked for). `price_type=price_self`
-  is a feature: the client's own `price` (and `discount`, `tax`,
-  `tax_included`) is kept as posted.
+  keeps the client's own `price` (and `discount`, `tax`, `tax_included`) as
+  posted **only if the parameter `catalog_order_price_self` is `on`** (off by
+  default: otherwise anybody can order for 1). With it off the line is
+  charged the catalog price.
 - **Expired access token.** An AJAX POST that meets an expired `access_token`
   cookie is sent through `/auth/refresh-token` and comes back to `/cart` with
   its body (308, see §10); if the session cannot be renewed the cookies are
@@ -491,8 +493,9 @@ adds computed keys for many models — they are listed below as "in toArray".
   `description` (text), `kind` (subtype within the type), `value` (array),
   `order` (int), `status` (bool)
 - `kind` is validated per type: for `delivery` it is `pickup`, `courier` or
-  `carrier` (`App\Domain\References\Delivery::KIND`), anything else is saved
-  as `''`; other types have no kinds. `description` is free text for any type
+  `carrier` (`App\Domain\References\Delivery::KIND`), for `order_status`
+  it is `canceled` (`OrderStatus::KIND`; such orders do not count in "bought
+  together"), anything else is saved as `''`; other types have no kinds. `description` is free text for any type
   (the panel edits it for deliveries and payments).
 - The `value` of a **delivery** is a list of `{uuid, condition}` pairs (service
   product + minimal cart total) — do not read `kind`/`description` from it.
@@ -575,7 +578,7 @@ Everything is registered in `App\Application\TwigExtension`
 | `catalog_attribute(criteria={}, order={})` | catalog attributes | Collection |
 | `catalog_order(criteria={}, order={'date':'desc'}, limit=10, offset=null)` | orders | Collection\|CatalogOrder |
 | `catalog_category_tree(root=null)` | the shown categories as a tree; `root` is a category uuid or address (top level by default). Node: `category`, `uuid`, `title`, `address`, `image` (first image `File` or `null`), `own_count`, `count` (what the category page lists: nested products only where `is_allow_nested`), `children`. A hidden category takes its branch with it. Two queries for the whole tree | array |
-| `catalog_product_bought_together(product, limit=4)` | products found in the same orders as `product` (model or uuid), the most frequent first, each with `together` (shared orders). Only `status=work`, `type=product`, shown categories; never the product itself. Empty for `null` | Collection |
+| `catalog_product_bought_together(product, limit=4)` | products found in the same orders as `product` (model or uuid), the most frequent first, each with `together` (shared orders). Only `status=work`, `type=product`, shown categories; never the product itself; orders whose status has `kind=canceled` are not counted. Empty for `null` | Collection |
 | `catalog_product_popular(limit=10, type='product')` | top by number of orders | Collection |
 | `catalog_product_view(uuid=null, limit=10)` | writes uuid into the "viewed" session list and/or returns the list | array |
 | `catalog_product_price_type()` | `needs_context` — price type for the current user (`price` or from `catalog_price_type`) | string |
@@ -799,3 +802,9 @@ and `p500` (in `theme/default` they are minimal).
   fails clears both cookies and lets the request through as a guest.
   Two parallel requests with one expired token are fine: the replaced refresh
   token is accepted for 30 seconds more.
+- **One address, several products = variants.** The product page receives
+  `products`: every `status=work` product with that address. So variants
+  (colour, size) are products that share an address; a generated address
+  (`common_auto_generate_address`) is shared by the products of one category
+  with one title and made unique (vendor code / external id suffix, then a
+  counter) for any other product that would collide.

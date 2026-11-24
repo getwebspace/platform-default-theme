@@ -1,0 +1,95 @@
+{#
+{% include 'components/fast-order.twig' %}
+#}
+
+<button class="btn" type="button" data-fast-order>Быстрый заказ</button>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        $('[data-fast-order]').on('click', (e) => {
+            e.preventDefault()
+
+            const options = catalog.getOptions()
+            let products = []
+
+            // on cart or in product container
+            if (location.pathname.startsWith('/cart')) {
+                products = JSON.parse(localStorage.getItem(options.storage) || '[]')
+                    .map((item) => ({
+                        uuid: item.uuid,
+                        price: item.price,
+                        price_type: item.price_type,
+                        quantity: item.quantity,
+                    }));
+            } else {
+                const $product = $(e.target).parents('[data-catalog-item]')
+
+                if ($product) {
+                    const uuid = $product.find('[data-catalog-item-attr="uuid"]').text()
+                    const price = $product.find('[data-catalog-item-attr="price"]').text()
+                    const price_type = $product.find('[data-catalog-item-attr="price_type"]').text()
+
+                    products = [{uuid, price, price_type, quantity: 1}]
+                }
+            }
+
+            if (products.length) {
+                Swal.fire({
+                    title: `БЫСТРЫЙ ЗАКАЗ`,
+                    html:
+                        `<input type="text" id="name" value="" name="name" class="swal2-input" placeholder="Ваше имя">` +
+                        `<input type="tel" id="phone" value="" name="phone" class="swal2-input" placeholder="Ваш телефон">` +
+                        `<div class="mt-3 small">Мы свяжемся с вами в самое ближайшее время.</div>` +
+                        `<div class="mt-1 small">Нажимая на кнопку «Заказать» вы даете согласие на обработку персональных данных в соответствии с пользовательским соглашением.</div>`,
+                    confirmButtonText: 'Заказать',
+                    showCloseButton: true,
+                    preConfirm: () => {
+                        const name = Swal.getPopup().querySelector('[name="name"]').value
+                        const phone = Swal.getPopup().querySelector('[name="phone"]').value
+
+                        if (!name) {
+                            Swal.showValidationMessage(`Введите Ваш имя!`)
+                        }
+                        if (!phone) {
+                            Swal.showValidationMessage(`Введите Ваш телефон!`)
+                        }
+                        return {name, phone}
+                    }
+                }).then(async (result) => {
+                    const data = new FormData();
+
+                    data.append('delivery[client]', result.value.name)
+                    data.append('phone', result.value.phone)
+
+                    products.forEach((product) => {
+                        data.append(`products[${product.uuid}][count]`, product.quantity)
+                        data.append(`products[${product.uuid}][price]`, product.price)
+                        data.append(`products[${product.uuid}][price_type]`, product.price_type)
+                    });
+
+                    // Google reCAPTCHA работает если подключен mixin/recaptcha.twig
+                    if (typeof (grecaptcha) !== 'undefined' && grecaptcha.getToken) {
+                        data.append('recaptcha', await grecaptcha.getToken())
+                    }
+
+                    $.ajax({
+                        url: options.cart.url || '/cart',
+                        type: 'POST',
+                        data,
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        success: (res) => {
+                            if (res?.redirect) {
+                                // flexibility
+                                setTimeout(() => {location = res.redirect}, options.cart.delay)
+                            } else {
+                                Swal.fire('Ошибка!', 'Произошла ошибка, попробуйте позже..', 'error')
+                            }
+                        },
+                    })
+                })
+            }
+        })
+    });
+</script>
