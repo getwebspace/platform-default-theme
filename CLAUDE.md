@@ -35,10 +35,18 @@ specific changes).
   `layout.twig` and `mixin/*` come from (see §9).
 
 The active theme is set by the **`common_theme`** parameter (admin panel →
-parameters). Lookup order for a template by name: first `theme/<theme>/`,
-then `src/Template/`, then `src/Template/errors/`. So a theme can override
-`layout.twig`, any `mixin/*`, and any error page by placing a file with the
-same name.
+parameters). Lookup order for a template by name: first `src/Template/`, then
+`theme/<theme>/`, then `src/Template/errors/` (the theme and the error pages
+are added with `addPath()`, i.e. *after* the engine's own folder).
+
+⚠️ So **the engine wins a name clash**: a theme's `layout.twig` or
+`mixin/<name>.twig` is never loaded while `src/Template/` has a file of that
+name — `{% extends 'layout.twig' %}` always gets the engine's skeleton, and
+a theme `layout.twig` is dead code (this was documented the other way round
+before; check with `{{ _self }}` / the DEBUG error message if in doubt).
+Name your own files differently (`main.twig`, `partials/…`). What *can* be
+replaced by name are the error pages (`p404.twig`…), because they exist only
+in `src/Template/errors/`, which comes last.
 
 ### Response format (`respond()`)
 
@@ -135,7 +143,9 @@ via the JSON `template` field (see the `CatalogCategory`,
 ### 3.4 Catalog — `Common\Catalog\ListAction`
 
 - **Route:** `GET /catalog[/{args:.*}]` (`common:catalog:list`). A trailing
-  number is the pagination offset. Three modes determined by the path:
+  number is the pagination offset — but the whole path is tried as an address
+  first (`/catalog/shoes/42` is a product with address `shoes/42` if there is
+  one, else page 42 of `shoes`). Three modes determined by the path:
 
 **Catalog storefront** (`/catalog`):
 - **Template:** `parameter('catalog_category_template', 'catalog.category.twig')`
@@ -165,7 +175,11 @@ via the JSON `template` field (see the `CatalogCategory`,
 **Storefront/category filtering query params** (GET):
 `price[min]`, `price[max]`, `country`, `manufacturer`, `order`
 (`title`|`price`), `direction` (`asc`|`desc`), plus any attribute `address`
-with `is_filter = true` → `?<attr_address>=<value>`.
+with `is_filter = true` → `?<attr_address>=<value>`. Several values of one
+attribute are allowed and match any of them: `?color[]=red&color[]=blue`
+(different attributes are combined with AND). The page is cut in SQL
+(`forPage`), but `products.all` still loads the whole category, so avoid
+iterating it in a template on a big catalog.
 
 ### 3.5 Cart / checkout — `Common\Catalog\CartAction`
 
@@ -180,6 +194,16 @@ with `is_filter = true` → `?<attr_address>=<value>`.
 - **POST response:** JSON `{ redirect: '/cart/done/<uuid>' }` (or a payment
   plugin URL). Errors — in `_error` (`email`, `phone`, `shipping`,
   `grecaptcha`).
+- **What the server keeps of `products`** (`OrderService::sanitizeCartProducts`):
+  only existing products with `status=work` and `count > 0`. The price is the
+  catalog one; `price_wholesale` is applied only when `count >=
+  priceWholesaleFrom` (whatever the client asked for). `price_type=price_self`
+  is a feature: the client's own `price` (and `discount`, `tax`,
+  `tax_included`) is kept as posted.
+- **Expired access token.** An AJAX POST that meets an expired `access_token`
+  cookie is sent through `/auth/refresh-token` and comes back to `/cart` with
+  its body (308, see §10); if the session cannot be renewed the cookies are
+  cleared and the order goes on as a guest's.
 
 ### 3.6 Order placed — `Common\Catalog\CartDoneAction`
 
@@ -303,6 +327,10 @@ methods are available (`{{ product.price('price') }}`), as well as relations
 (`{{ publication.category.title }}`). `toArray()` (used in JSON responses)
 adds computed keys for many models — they are listed below as "in toArray".
 
+> In `toArray()` the `files` key (and `relations`, `products`, …) holds
+> **model collections**, not nested arrays — they turn into arrays only when
+> the whole thing is JSON-encoded. Do not index them as arrays in PHP code.
+
 > `$hidden` is set per model and is NOT inherited. Below it is noted what is
 > hidden from serialization.
 
@@ -398,6 +426,10 @@ adds computed keys for many models — they are listed below as "in toArray".
   - `attribute(address, default=null)` — the product's attribute value (typed)
   - `specification()` / `specificationWithClass()` — `L×W×H` (+ length class)
   - `weight()` / `weightWithClass()`
+- **Stock status:** `stock_status_uuid` and the relation `stockStatus`
+  (a `Reference` of type `stock_status`, `null` if none). In `toArray` the
+  key `stock_status` (`uuid`, `title`) is present only when the relation was
+  loaded.
 - **in toArray:** `calculated.{price,price_wholesale}`, trimmed `category`,
   `attributes` (keyBy `address`), `relations` (depth 1), `files`
 - In an order-line context `totalPrice/totalCount/totalSum/totalDiscount/
@@ -455,8 +487,18 @@ adds computed keys for many models — they are listed below as "in toArray".
   (only `status=work`)
 
 ### Reference (`reference`) — reference books
-- **Fields:** `uuid`, `type` (see the list of types in §7), `title`, `value`
-  (array), `order` (int), `status` (bool)
+- **Fields:** `uuid`, `type` (see the list of types in §7), `title`,
+  `description` (text), `kind` (subtype within the type), `value` (array),
+  `order` (int), `status` (bool)
+- `kind` is validated per type: for `delivery` it is `pickup`, `courier` or
+  `carrier` (`App\Domain\References\Delivery::KIND`), anything else is saved
+  as `''`; other types have no kinds. `description` is free text for any type
+  (the panel edits it for deliveries and payments).
+- The `value` of a **delivery** is a list of `{uuid, condition}` pairs (service
+  product + minimal cart total) — do not read `kind`/`description` from it.
+- The `value` of a **requisite** record: `legal_name`, `tax_id`,
+  `tax_reason`, `reg_id`, `address`, `director`, `bank`, `bank_id`, `account`,
+  `corr_account`, `email`, `phone` (all optional strings).
 - **Method:** `value($key=null, $default=null)` — the whole JSON or one key
 
 ### Parameter (`params`)
@@ -532,6 +574,8 @@ Everything is registered in `App\Application\TwigExtension`
 | `catalog_product_count(criteria={})` | always `status=work` | int |
 | `catalog_attribute(criteria={}, order={})` | catalog attributes | Collection |
 | `catalog_order(criteria={}, order={'date':'desc'}, limit=10, offset=null)` | orders | Collection\|CatalogOrder |
+| `catalog_category_tree(root=null)` | the shown categories as a tree; `root` is a category uuid or address (top level by default). Node: `category`, `uuid`, `title`, `address`, `image` (first image `File` or `null`), `own_count`, `count` (what the category page lists: nested products only where `is_allow_nested`), `children`. A hidden category takes its branch with it. Two queries for the whole tree | array |
+| `catalog_product_bought_together(product, limit=4)` | products found in the same orders as `product` (model or uuid), the most frequent first, each with `together` (shared orders). Only `status=work`, `type=product`, shown categories; never the product itself. Empty for `null` | Collection |
 | `catalog_product_popular(limit=10, type='product')` | top by number of orders | Collection |
 | `catalog_product_view(uuid=null, limit=10)` | writes uuid into the "viewed" session list and/or returns the list | array |
 | `catalog_product_price_type()` | `needs_context` — price type for the current user (`price` or from `catalog_price_type`) | string |
@@ -612,7 +656,7 @@ Public route names are in §3 (in parentheses, e.g. `common:catalog:list`).
 **`Reference` types** (`reference(type)`): `text`, `store_location`,
 `currency`, `order_status`, `stock_status`, `payment`, `delivery`, `country`,
 `tax_rate`, `length_class`, `weight_class`, `address_format`,
-`social_network`, `manufacturer`, `document`.
+`social_network`, `manufacturer`, `document`, `requisite`.
 
 **Sorting:**
 - Catalog: by ∈ `title|price|stock|date|order`, direction ∈ `ASC|DESC`
@@ -685,17 +729,24 @@ Includes `/assets/js/wse.js?v={{ SHA }}`. The `title` variable is available
 (if the theme `{% set %}`s it).
 
 ### `src/Template/mixin/*` — reusable pieces (available to the theme via `{% include 'mixin/...' %}`)
-- `catalog.twig` — client-side cart (localStorage, jQuery), events
-  `on:cart:add`, `on:cart:update` (the theme attaches handlers via
-  `window.catalog`)
+- `catalog.twig` — client-side cart (localStorage), **no dependencies** (it
+  used to need jQuery). `window.catalog` keeps the same options, selectors
+  (`data-catalog-*`) and `cart*` methods. Events: the handlers
+  `options.events['on:cart:add']` … and DOM events `event:catalog:<name>` on
+  `window` (`cart:add`, `cart:update`, `cart:remove`, `cart:remove:all`,
+  `cart:checkout:before|after`, `ready`) — data in `e.detail`, not as a second
+  argument as with jQuery. `cartAddItemFromElement(element)` replaced
+  `cartAddItemFromJQuery`; `cartCheckout()` marks bad required fields with
+  `check-error` and returns `false` instead of throwing. `options.cart.url`
+  is where the order is posted (the current path by default)
 - `recaptcha.twig` — the reCAPTCHA widget include (if enabled)
 - `img.twig` / `img-script.twig` / `picture.twig` — lazy/responsive images
 - `gallery.twig` — an entity's image gallery (`files`/`images`)
 - `form.twig` — form field markup
 - `datatable.twig`, `quiz.twig`, `cookies.twig`, `adbd.twig` — extra widgets
 
-A theme can override any `mixin/*` by placing
-`theme/<theme>/mixin/<name>.twig`.
+A theme **cannot** override a `mixin/*` by name (the engine's folder is
+searched first, §1) — copy the file under another name and include that.
 
 ### Error pages
 `p400 p403 p404 p405 p500 p503` — the engine looks for them first in the
@@ -732,3 +783,19 @@ and `p500` (in `theme/default` they are minimal).
 - **reCAPTCHA.** With `recaptcha_is_enabled=on` every POST (form, guestbook,
   cart, login, review) requires a valid `recaptcha` in the body, otherwise
   `_error['grecaptcha']`.
+- **Twig errors in DEBUG** (`DEBUG=1`, development only; production behaves
+  as before). A PHP warning/notice raised while a template renders is turned
+  into an error that names the template and the line (`... in "x.twig" at
+  line 12`) instead of being printed into the HTML — typically inside an
+  attribute, with status 200. And a template that extends itself, directly
+  or through others, is reported at once with the whole chain and the files
+  (`Template "a.twig" extends itself: a.twig (…) -> b.twig (…) -> a.twig (…)`)
+  instead of a timeout that names nothing. Without DEBUG neither check runs.
+- **Auth cookies and AJAX.** The `access_token` cookie (path `/`) lives a
+  month but its JWT ten minutes; the `refresh_token` cookie is sent to
+  `/auth/*` only. An expired token makes any request 308-redirect to
+  `/auth/refresh-token?redirect=<path?query>`; the refresh answers with a 308
+  back to that address (method and body kept, JSON or not). A refresh that
+  fails clears both cookies and lets the request through as a guest.
+  Two parallel requests with one expired token are fine: the replaced refresh
+  token is accepted for 30 seconds more.
